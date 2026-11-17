@@ -1,0 +1,16 @@
+Column,Description
+Article_ID,Unique identifier assigned to each news article
+Title,Headline or title of the news article
+Article_Text,Main body text of the news article
+Full_Text,Combined title and article text used for NLP modeling
+Category,Target news category label for classification
+Source,News source or publisher name
+Author,Author or reporting desk associated with the article
+Region,Geographic region related to the news article
+Published_Date,Publication date of the article
+Keywords,Important keywords extracted from the article title
+Title_Length,Total number of characters in the title
+Article_Length,Total number of characters in the article body
+Word_Count,Total number of words in the combined news text
+Reading_Difficulty,Estimated reading difficulty level of the article
+Language,Language of the news article
