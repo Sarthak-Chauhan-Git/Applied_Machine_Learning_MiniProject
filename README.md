@@ -1,52 +1,56 @@
-# Experiment 10 Mini Project
+# newsIQ: Multiclass News Article Classification Using Classical NLP 📰🧠
 
-## News Article Multiclass Classification Using NLP
+An Applied Machine Learning Mini Project (Experiment 10)
+School of Computer Science, UPES Dehradun
 
-### Title Page
+## 📌 Overview
 
-| Academic detail   | Information                                                                       |
-| ----------------- | --------------------------------------------------------------------------------- |
-| **Project title** | News Article Multiclass Classification Using NLP                                  |
-| **Experiment**    | 10 – Mini Project                                                                 |
-| **Subject**       | `Applied Machine Learning`                                                        |
-| **Faculty**       | `Dr. Sahinur Rahman Laskar`                                                       |
-| **Institution**   | `UPES`                                                                            |
-| **Repository**    | `https://github.com/Sarthak-Chauhan-Git/Applied_Machine_Learning_MiniProject.git` |
+newsIQ is an end-to-end Natural Language Processing (NLP) system that automatically assigns a news article to one of eight categories: **Business, Education, Entertainment, Health, Politics, Science, Sports,** and **Technology**. The project compares seven classical machine-learning models on Bag-of-Words (BoW) and TF-IDF representations, tunes the strongest linear model with cross-validated grid search, evaluates it with multiple metrics, and serves the final pipeline through a Streamlit web app that shows the predicted category with a relative confidence score and the top-3 categories.
 
-### Team Members
+## Architecture
 
-| No. | Student name       | System ID / Roll No. |
-| --: | ------------------ | -------------------- |
-|   1 | `Sarthak Chauhan`  | `590030655`          |
-|   2 | `Ravinder Singh`   | `590030651`          |
-|   3 | `Aarti Somani`     | `590040559`          |
-|   4 | `Anshul Ghildiyal` | `590031643`          |
+<!-- Replace with your architecture diagram, e.g. docs/architecture.png -->
 
----
+`<img width="900" alt="newsIQ architecture" src="docs/architecture.png" />`
 
-## 1. Introduction
+## ✨ Features
 
-News websites publish large volumes of articles every day. Manually assigning each article to a category is slow and inconsistent. This project develops a multiclass Natural Language Processing (NLP) classifier that automatically assigns an article to one of eight categories: **Business, Education, Entertainment, Health, Politics, Science, Sports,** or **Technology**.
+- Eight-class news classification trained on 30,000 articles
+- Unified text-cleaning pipeline (lowercasing, URL/HTML/number/punctuation removal, stop-word and short-token filtering), reused identically at training and inference time
+- Comparison of seven classical models on TF-IDF unigram + bigram features
+- Leakage-safe design: vectorizers live inside scikit-learn pipelines, so vocabulary is learned only on training folds
+- Hyperparameter tuning of Linear SVM via `GridSearchCV`
+- Rich evaluation: accuracy, macro precision/recall/F1, weighted F1, 5-fold CV, confusion matrices, most informative words per class, and error analysis
+- Trained pipeline saved as `news_classifier.joblib` for reuse
+- **newsIQ** Streamlit frontend with headline and article inputs, color-coded category chips, relative confidence, and top-3 ranking
 
-The project compares several classical machine-learning models using Bag-of-Words (BoW) and TF-IDF text representations. It also tunes a Linear Support Vector Machine (SVM), evaluates the final model using multiple metrics, analyses errors, and saves the trained pipeline for inference on new articles.
+## 🧠 Problem Statement
 
-### Objectives
+News websites publish large volumes of articles every day, and assigning each one to a category by hand is slow and inconsistent. A reliable automatic classifier reduces editorial effort and makes archives searchable. This project studies how far classical, interpretable text-classification methods can go on this task, how BoW and TF-IDF features compare, and, importantly, how evaluation can be misleading when a dataset contains repeated article templates. We therefore report not only the scores but also a candid analysis of their limits.
 
-1. Collect and inspect a publicly available news dataset.
-2. Clean and normalize article text.
-3. Extract unigram and bigram features using BoW and TF-IDF.
-4. Train and compare seven classical machine-learning models.
-5. Tune the strongest linear model using cross-validated grid search.
-6. Evaluate accuracy, macro precision, macro recall, macro F1, weighted F1, confusion matrix, and 5-fold cross-validation.
-7. Demonstrate inference and save the trained classifier.
+## 📊 Performance
 
-## 2. Dataset Description
+Stratified 80:20 train/test split plus 5-fold stratified cross-validation on the training set. All seven models use TF-IDF unigram + bigram features.
 
-### Source
+| Model               | Accuracy | Macro Precision | Macro Recall | Macro F1 | Weighted F1 | 5-fold CV F1 |
+| ------------------- | -------: | --------------: | -----------: | -------: | ----------: | -----------: |
+| Logistic Regression |    1.000 |           1.000 |        1.000 |    1.000 |       1.000 |        1.000 |
+| Linear SVM          |    1.000 |           1.000 |        1.000 |    1.000 |       1.000 |        1.000 |
+| Multinomial NB      |    1.000 |           1.000 |        1.000 |    1.000 |       1.000 |        1.000 |
+| Complement NB       |    1.000 |           1.000 |        1.000 |    1.000 |       1.000 |        1.000 |
+| Decision Tree       |    1.000 |           1.000 |        1.000 |    1.000 |       1.000 |        1.000 |
+| Random Forest       |    1.000 |           1.000 |        1.000 |    1.000 |       1.000 |        1.000 |
+| KNN (k=5, cosine)   |    1.000 |           1.000 |        1.000 |    1.000 |       1.000 |        1.000 |
 
-The dataset is the [News Classification Dataset 2026](https://www.kaggle.com/datasets/mmumairkhattak/news-classification-dataset-2026-nlp-and-tc) from Kaggle. The local file is [`news_classification_dataset.csv`](./news_classification_dataset.csv).
+**Final tuned model:** Linear SVM (`C=0.1`, unigram features, `min_df=1`, `max_features=20000`), test accuracy **1.000** and macro F1 **1.000**.
 
-### Dataset profile
+### ⚠️ Interpreting these results
+
+The perfect scores should **not** be read as real-world generalization performance. The source CSV contains many repeated article templates, and these rows are retained so that all eight categories stay represented after preprocessing. A random split therefore places near-identical text in both the training and test partitions, which makes the task close to memorization and produces optimistic scores. A production-grade evaluation should deduplicate the data or use a group-based split by source or article identity. This is the main limitation of the current study and the first item in our future work.
+
+## 🗂️ Dataset
+
+**Source:** [News Classification Dataset 2026](https://www.kaggle.com/datasets/mmumairkhattak/news-classification-dataset-2026-nlp-and-tc) (Kaggle)
 
 | Property       |                                                    Value |
 | -------------- | -------------------------------------------------------: |
@@ -55,8 +59,6 @@ The dataset is the [News Classification Dataset 2026](https://www.kaggle.com/dat
 | Text fields    |                     `Title`, `Article_Text`, `Full_Text` |
 | Target field   |                                               `Category` |
 | Other metadata | Source, author, region, date, keywords, length, language |
-
-### Class distribution
 
 | Category      | Articles |
 | ------------- | -------: |
@@ -69,149 +71,127 @@ The dataset is the [News Classification Dataset 2026](https://www.kaggle.com/dat
 | Sports        |    3,690 |
 | Technology    |    3,734 |
 
-The classes are approximately balanced. The notebook verifies the shape, column types, missing values, and class distribution before modelling.
+The classes are approximately balanced.
 
-## 3. Methodology
+## ⚙️ System Architecture
 
-### 3.1 Data collection and column detection
+The pipeline consists of:
 
-The notebook searches the working directory and common notebook locations for a CSV whose filename contains `news` or `article`. If the real CSV is unavailable, it creates a clearly labelled synthetic corpus for demonstration only. The target is detected from low-cardinality object columns, with preference for names containing `category`, `label`, `class`, `topic`, `section`, or `type`. The longest text column is selected as the article body and a title column, when present, is prepended.
+1. **Data layer:** CSV ingestion with automatic target and text-column detection (low-cardinality target preferred by name; longest text column used as article body, with the title prepended when present)
+2. **Preprocessing:** lowercase, remove URLs, HTML tags, digits and non-alphabetic symbols, whitespace tokenization, English stop-word removal, drop tokens shorter than three characters, drop empty articles
+3. **Feature extraction:** CountVectorizer (BoW, unigrams), TF-IDF (unigrams), and TF-IDF (unigrams + bigrams with sublinear term frequency and a vocabulary limit)
+4. **Model zoo:** Logistic Regression, Linear SVM, Multinomial NB, Complement NB, Decision Tree, Random Forest, KNN
+5. **Tuning:** `GridSearchCV` over n-gram range, `min_df`, vocabulary size, and Linear SVM `C`
+6. **Evaluation:** held-out test set, 5-fold stratified CV, confusion matrices, per-class metrics, informative-word analysis, and misclassification review
+7. **Serving:** `news_classifier.joblib` loaded by a Streamlit app (`app.py`). Confidence is shown as a _relative_ score: a softmax over the SVM decision-function values, which is a ranking aid and not a calibrated probability
 
-### 3.2 Text preprocessing
+## 🛠️ Tech Stack
 
-Each article is processed using the following steps:
+- **Language:** Python
+- **ML / NLP:** scikit-learn (TF-IDF, CountVectorizer, Linear SVM, Logistic Regression, Naive Bayes, Tree and Forest models, KNN, GridSearchCV)
+- **Data:** pandas · NumPy
+- **Model persistence:** joblib
+- **Experimentation:** Jupyter Notebook
+- **Frontend:** Streamlit with custom CSS ("Newsprint & Ink" theme)
 
-1. Convert text to lowercase.
-2. Remove URLs.
-3. Remove HTML tags.
-4. Remove numeric characters.
-5. Remove punctuation and non-alphabetic symbols.
-6. Tokenize by whitespace.
-7. Remove English stop words.
-8. Remove tokens shorter than three characters.
+## 🧪 Evaluation Metrics
 
-Empty articles are removed. Repeated text rows are retained because the source dataset contains repeated article templates and removing them would discard the class representation needed for stratified training and evaluation.
+- **Accuracy:** proportion of correctly classified articles
+- **Macro precision / recall / F1:** per-category averages that treat every category equally
+- **Weighted F1:** F1 weighted by category frequency
+- **5-fold CV F1:** stability estimate across five stratified training folds
+- **Confusion matrix:** raw and normalized, showing category-level error patterns
 
-### 3.3 Feature extraction
-
-The project compares:
-
-- CountVectorizer / Bag-of-Words with unigrams.
-- TF-IDF with unigrams.
-- TF-IDF with unigrams and bigrams, sublinear term frequency, and a vocabulary limit.
-
-All vectorizers are placed inside scikit-learn pipelines so vocabulary learning occurs only on the training folds and does not leak test information.
-
-### 3.4 Models
-
-The following seven models are trained using TF-IDF unigram–bigram features:
-
-1. Logistic Regression
-2. Linear SVM
-3. Multinomial Naive Bayes
-4. Complement Naive Bayes
-5. Decision Tree
-6. Random Forest
-7. K-Nearest Neighbors
-
-The baseline models use a fixed random seed where supported. The strongest baseline is tuned using `GridSearchCV` over TF-IDF n-gram range, minimum document frequency, vocabulary size, and Linear SVM regularization parameter `C`.
-
-## 4. Experiments and Evaluation
-
-The dataset is divided into training and test partitions using a stratified 80:20 split. Stratification preserves the category proportions. Baseline models are evaluated on the held-out test set and by 5-fold stratified cross-validation on the training set.
-
-### Evaluation metrics
-
-- **Accuracy:** proportion of correctly classified articles.
-- **Macro precision:** average precision across categories, treating each category equally.
-- **Macro recall:** average recall across categories.
-- **Macro F1:** harmonic mean of macro precision and macro recall; useful for balanced multiclass comparison.
-- **Weighted F1:** F1 weighted by category frequency.
-- **5-fold CV F1:** stability estimate across five training folds.
-- **Confusion matrix:** category-level error pattern.
-
-### Results table
-
-Run all cells in the notebook to regenerate the following table from the local dataset. The notebook prints the exact values and plots a comparison chart.
-
-| Model               | Accuracy | Macro Precision | Macro Recall | Macro F1 | Weighted F1 | 5-fold CV F1 |
-| ------------------- | -------: | --------------: | -----------: | -------: | ----------: | -----------: |
-| Logistic Regression |    1.000 |           1.000 |        1.000 |    1.000 |       1.000 |        1.000 |
-| Linear SVM          |    1.000 |           1.000 |        1.000 |    1.000 |       1.000 |        1.000 |
-| Multinomial NB      |    1.000 |           1.000 |        1.000 |    1.000 |       1.000 |        1.000 |
-| Complement NB       |    1.000 |           1.000 |        1.000 |    1.000 |       1.000 |        1.000 |
-| Decision Tree       |    1.000 |           1.000 |        1.000 |    1.000 |       1.000 |        1.000 |
-| Random Forest       |    1.000 |           1.000 |        1.000 |    1.000 |       1.000 |        1.000 |
-| KNN (k=5, cosine)   |    1.000 |           1.000 |        1.000 |    1.000 |       1.000 |        1.000 |
-
-The executed real-dataset run selected Logistic Regression as the best baseline. Grid search selected Linear SVM with `C=0.1`, unigram features, `min_df=1`, and `max_features=20000`; its test accuracy and macro F1 were both **1.000**. The notebook also reports per-class precision/recall/F1, a raw and normalized confusion matrix, most informative words per class, and representative misclassified articles.
-
-### Results interpretation and limitation
-
-The perfect scores must be interpreted cautiously. The supplied CSV contains many repeated article templates, and repeated rows are retained so that all eight categories remain represented after preprocessing. Randomly splitting these rows allows near-identical text to occur in both training and test partitions, which can produce optimistic scores. A production evaluation should deduplicate or group-split by source/article identity before reporting generalization performance.
-
-## 5. Execution Instructions
-
-### Requirements
+## 🚀 Getting Started
 
 ```bash
+git clone https://github.com/Sarthak-Chauhan-Git/Applied_Machine_Learning_MiniProject.git
+cd Applied_Machine_Learning_MiniProject
 pip install -r requirements.txt
 ```
 
-### Run the notebook
-
-Open [`Exp10_News_Classification_MiniProject.ipynb`](./Exp10_News_Classification_MiniProject.ipynb) in Jupyter Notebook or VS Code and select **Run All**.
+**Run the experiments**
 
 ```bash
 jupyter notebook Exp10_News_Classification_MiniProject.ipynb
 ```
 
-The notebook automatically looks for `news_classification_dataset.csv`. It should be kept beside the notebook for a reproducible real-dataset run.
+Keep `news_classification_dataset.csv` beside the notebook for a reproducible real-dataset run, then select **Run All**.
 
-### Use the saved model
+**Run the web app**
 
-The final fitted pipeline is saved as [`news_classifier.joblib`](./news_classifier.joblib). The notebook exposes:
+```bash
+streamlit run app.py
+```
+
+**Use the saved model in Python**
 
 ```python
 predict_news("The central bank raised interest rates as inflation increased")
 ```
 
-The function cleans the input using the same preprocessing logic and returns the predicted category.
+## 📁 Repository Contents
 
-## 6. Repository Contents
+| File                                          | Purpose                                                            |
+| --------------------------------------------- | ------------------------------------------------------------------ |
+| `Exp10_News_Classification_MiniProject.ipynb` | Full implementation, experiments, plots, evaluation, and inference |
+| `app.py`                                      | newsIQ Streamlit frontend                                          |
+| `.streamlit/config.toml`                      | Streamlit theme configuration                                      |
+| `news_classification_dataset.csv`             | Kaggle news dataset                                                |
+| `data_dictionary.csv`                         | Dataset column descriptions                                        |
+| `news_classifier.joblib`                      | Saved final model pipeline                                         |
+| `requirements.txt`                            | Python dependencies                                                |
 
-| File                                                                                           | Purpose                                                                |
-| ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| [`Exp10_News_Classification_MiniProject.ipynb`](./Exp10_News_Classification_MiniProject.ipynb) | Complete implementation, experiments, plots, evaluation, and inference |
-| [`news_classification_dataset.csv`](./news_classification_dataset.csv)                         | Kaggle news dataset                                                    |
-| [`data_dictionary.csv`](./data_dictionary.csv)                                                 | Dataset column descriptions                                            |
-| [`news_classifier.joblib`](./news_classifier.joblib)                                           | Saved final model pipeline                                             |
-| [`requirements.txt`](./requirements.txt)                                                       | Python dependencies                                                    |
-| [`Mini_project_guideline_Exp 10.docx`](./Mini_project_guideline_Exp%2010.docx)                 | Assignment guideline                                                   |
+## 📈 Future Scope
 
-## 7. Conclusion
+- Deduplicate and group-split the data to obtain an honest estimate of generalization
+- Evaluate on an independent, real-world news corpus (out-of-distribution test)
+- Word2Vec, GloVe, fastText, LSTM/CNN, and transformer models (BERT, DistilBERT)
+- Lemmatization, named-entity features, and domain-specific phrase features
+- Probability calibration and confidence thresholds (e.g. abstain on low-confidence predictions)
+- Multilingual and Hindi/Hinglish news classification
+- Explainability with SHAP or LIME
+- Deployment via FastAPI/Flask, plus automated tests, experiment tracking, model monitoring, and data-drift detection
 
-This project implements the complete NLP workflow required by Experiment 10: data collection, text cleaning, tokenization, feature extraction, model development, model comparison, cross-validation, detailed evaluation, and inference. TF-IDF with n-grams gives the classifiers informative sparse features, while Linear SVM and Logistic Regression provide strong baselines for high-dimensional text.
+## Contact
 
-The final model should be selected using macro F1, cross-validation stability, confusion-matrix behaviour, and practical inference speed rather than accuracy alone. The dataset and model are intended for academic experimentation and should not be treated as a production news moderation or editorial system without further validation.
+For any inquiries or feedback, please contact:
 
-## 8. Future Scope
+**Name:** Sarthak Chauhan
+**System ID:** 590030655
+**Education:** B.Tech, UPES, Dehradun
+**Email:** sarthakchauhan5002@gmail.com
+**GitHub:** https://github.com/Sarthak-Chauhan-Git/Applied_Machine_Learning_MiniProject
 
-- Use Word2Vec, GloVe, fastText, LSTM/CNN, or transformer models such as BERT and DistilBERT.
-- Add lemmatization, named-entity features, and domain-specific phrase features.
-- Investigate class imbalance, probability calibration, and confidence thresholds.
-- Test multilingual and Hindi/Hinglish news classification.
-- Add explainability with SHAP or LIME.
-- Deploy the saved pipeline through Streamlit, Flask, or FastAPI.
-- Add automated tests, experiment tracking, model monitoring, and data-drift detection.
+**Name:** Ravinder Singh
+**System ID:** 590030651
+**Education:** B.Tech, UPES, Dehradun
+**Email:** ravindersingh522876@gmail.com
+**GitHub:** https://github.com/Sarthak-Chauhan-Git/Applied_Machine_Learning_MiniProject
 
-## 9. Presentation Outline
+**Name:** Anshul Ghildiyal
+**System ID:** 590031643
+**Education:** B.Tech, UPES, Dehradun
+**Email:** anshul.ghildiyal07@gmail.com
+**GitHub:** https://github.com/Sarthak-Chauhan-Git/Applied_Machine_Learning_MiniProject
 
-The report maps directly to the presentation requirements:
+## Mentor
 
-1. **Title slide:** project title, four team placeholders, system IDs, subject, faculty, and institution.
-2. **Introduction:** motivation and objectives.
-3. **Dataset description:** source, fields, size, classes, and distribution.
-4. **Methodology:** preprocessing, BoW/TF-IDF, models, and tuning.
-5. **Experiment results:** comparison table, CV scores, confusion matrix, and error analysis.
-6. **Conclusion and future scope:** findings, limitations, and extensions.
+**Dr. Sahinur Rahman Laskar**
+Assistant Professor (Senior Scale)
+School of Computer Science, UPES, Dehradun, India
+**Email:** sahinurlaskar.nits@gmail.com / sahinur.laskar@ddn.upes.ac.in
+
+## Citation
+
+```bibtex
+@misc{newsiq2026,
+  title={newsIQ: Multiclass News Article Classification Using Classical NLP and TF-IDF Features},
+  author={Sarthak Chauhan and Ravinder Singh and Anshul Ghildiyal and Sahinur Rahman Laskar},
+  year={2026},
+  eprint={<arXiv-ID>},
+  archivePrefix={arXiv},
+  primaryClass={cs.CL},
+  url={https://arxiv.org/abs/<arXiv-ID>}
+}
+```
